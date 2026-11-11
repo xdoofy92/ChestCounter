@@ -1,2 +1,0 @@
-- Que solo cuenten en battle royale, no en otro modo de juego, ya que solo ahi estan los tesoros y los tokens.
-- Revisa que cuenten los tesoros del squad tambien en mis tesoros, añadiendo una opcion para ello.
