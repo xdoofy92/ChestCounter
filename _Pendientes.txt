@@ -1,2 +1,0 @@
-- Que las estadisticas solo cuenten de battle royale, no en otro modo de juego, ya que solo BR tiene los tesoros, etc.
-- Revisar que cuenten los tesoros del squad tambien en mis tesoros, añadiendo una opcion para ello en configuracion.
