@@ -187,7 +187,7 @@ ChestCounter.exe --overlay-preview <file.png>   save overlay previews and quit
 
 ## Building from source
 
-Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (Windows x64) and double-click **`build.bat`**: the exe goes to `dist\ChestCounter.exe`. GitHub Actions builds the exe on every push and publishes it when a `v*` tag is pushed.
+Double-click **`build.bat`** (Spanish or English): it checks the requirements and, if the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) is missing, offers to install it. The exe goes to `dist\ChestCounter.exe`. GitHub Actions builds the exe on every push and publishes it when a `v*` tag is pushed.
 
 ## License and credits
 

@@ -191,7 +191,7 @@ ChestCounter.exe --overlay-preview <archivo.png>   guarda vistas previas del ove
 
 ## Compilar desde el código
 
-Instala el [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) (Windows x64) y haz doble clic en **`build.bat`**: el exe se genera en `dist\ChestCounter.exe`. GitHub Actions compila el exe en cada push y lo publica cuando se sube una etiqueta `v*`.
+Haz doble clic en **`build.bat`** (en español o inglés): comprueba los requisitos y, si falta el [SDK de .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0), te ofrece instalarlo. El exe se genera en `dist\ChestCounter.exe`. GitHub Actions compila el exe en cada push y lo publica cuando se sube una etiqueta `v*`.
 
 ## Licencia y créditos
 
