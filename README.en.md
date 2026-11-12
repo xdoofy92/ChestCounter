@@ -84,7 +84,7 @@ It uses the window's colors (dark, or light when Windows is in light mode) and a
 Turn it on in **Settings → Teammates in the report** (off by default). You get:
 
 - **Exact**: who you play with, matches together and wins together.
-- **Approximate**: each teammate's chests. They come from **your** replay, and Fortnite only records what happens **within 1,087 m of you** (measured on real replays). If a teammate goes further, their chests are not counted: they are a **minimum (≥)**.
+- **Approximate**: each teammate's chests. They come from **your** replay, and only include openings Fortnite sent to the recorder. There is no guaranteed maximum radius: they are a **minimum (≥)**.
 - **Team chests**: you + your teammates, in total and per match, with each one's share; handy when you hunt for a random item that drops from chests.
 - **Top teammates**: most chests seen, best average, best single match and most wins together.
 
@@ -165,7 +165,7 @@ Everything is saved in `%APPDATA%\ChestCounter`. **Your history does not depend 
 
 **Nothing is counted.** Check that replays are on in Fortnite. The window tells you if the replays folder is missing or empty.
 
-**Why are my teammates' chests low?** Only those opened within 1,087 m of you are seen. It is a minimum, not their total.
+**Why are my teammates' chests low?** Your replay may omit distant openings. There is no guaranteed fixed radius. It is a minimum, not their total.
 
 **How do I start over?** **Settings → Reset statistics…** (with confirmation and a `data-backup-….json` backup).
 
@@ -194,3 +194,5 @@ Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (Wi
 [MIT](LICENSE). Replay parsing is based on [FortniteReplayDecompressor](https://github.com/Shiqan/FortniteReplayDecompressor) by Shiqan (MIT), lightly modified: see [`lib/PATCHES.md`](lib/PATCHES.md).
 
 This project is not affiliated with, endorsed or sponsored by Epic Games. Fortnite is a registered trademark of Epic Games, Inc.
+
+Statistics only include recognized Battle Royale and Zero Build playlists (v43+). Settings can be resized and maximized. **Include team treasures** adds shared team rewards to your treasure totals without changing stored history. The treasure report separates own, team and other observed rewards. The permanent Pirate Shop Token card below the chart and action buttons shows its status even with no detections. Confirmed detections in the current or previous match are highlighted in gold with recipient details; clicking opens Treasures. Settings groups teammate visibility and shared chest/treasure totals under Team and shared treasures. Unknown numeric prize IDs are retained without guessing their identity.

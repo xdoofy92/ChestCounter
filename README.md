@@ -53,6 +53,8 @@ ChestCounter lee las repeticiones (replays) que Fortnite guarda de cada partida 
 
 La ventana se puede redimensionar y maximizar: todo crece en proporción.
 
+Las estadísticas incluyen únicamente las playlists reconocidas de Battle Royale y Cero construcción (v43 o posterior). Ajustes también se puede redimensionar y maximizar.
+
 ## El informe
 
 `report.html` se abre en tu navegador (botón **Informe**) y se actualiza solo. Empieza siempre en **Resumen**; arriba tienes las pestañas:
@@ -84,9 +86,11 @@ Usa los colores de la ventana (oscuro, o claro si Windows está en modo claro) y
 Actívalo en **Ajustes → Compañeros en el informe** (desactivado por defecto). Verás:
 
 - **Exacto**: con quién juegas, partidas juntos y victorias juntos.
-- **Aproximado**: los cofres de cada compañero. Salen de **tu** replay, y Fortnite solo graba lo que pasa **a menos de 1.087 m de ti** (medido en replays reales). Si un compañero se aleja más, sus cofres no se cuentan: son un **mínimo (≥)**.
+- **Aproximado**: los cofres de cada compañero. Salen de **tu** replay, y solo incluyen las aperturas que Fortnite envió al grabador. No hay un radio máximo garantizado: son un **mínimo (≥)**.
 - **Cofres del equipo**: tú + tus compañeros, en total y por partida, con el % que aporta cada uno; útil si buscáis un objeto aleatorio que sale de los cofres.
 - **Top de compañeros**: más cofres vistos, mejor media, récord en una partida y más victorias juntos.
+
+Con **Sumar tesoros del equipo** puedes incluir los premios compartidos en tus totales de tesoros. El informe distingue los propios, los del equipo y los de otros jugadores observados; un origen por coincidencia temporal se marca como probable. La tarjeta permanente **Token de Tienda Pirata**, debajo del gráfico y los botones, muestra el estado incluso sin detecciones. Si se identifica uno en la partida actual o anterior, se resalta en dorado e indica quién lo recibió; al pulsarla abre Tesoros. En Ajustes, **Equipo y tesoros compartidos** agrupa mostrar compañeros y sumar sus cofres o tesoros. Los premios de ID numérico desconocido se conservan sin inventar su identidad.
 
 Con **Sumar sus cofres a tu total** (también desactivado), tu total, media, récords y overlay incluyen los cofres de tu equipo. Tu historial no cambia: al desactivarlo vuelves a ver solo los tuyos.
 
@@ -165,7 +169,7 @@ Todo se guarda en `%APPDATA%\ChestCounter`. **Tu historial no depende de los rep
 
 **No se cuenta nada.** Comprueba que las repeticiones están activadas en Fortnite. La ventana te avisa si falta la carpeta de replays o está vacía.
 
-**¿Por qué los cofres de mis compañeros salen bajos?** Porque solo se ven los que abren a menos de 1.087 m de ti. Es un mínimo, no su total.
+**¿Por qué los cofres de mis compañeros salen bajos?** Porque tu replay puede omitir aperturas lejanas. No hay un radio fijo garantizado. Es un mínimo, no su total.
 
 **¿Cómo empiezo de cero?** **Ajustes → Restablecer estadísticas…** (con confirmación y copia de seguridad `data-backup-….json`).
 
