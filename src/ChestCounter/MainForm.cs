@@ -20,7 +20,7 @@ public sealed class MainForm : Form
     private bool? _treasureShown;
     private readonly Card _countCard;
     private readonly Label _countLabel;
-    private readonly ToolTip _countTip = new();
+    private readonly ThemedToolTip _countTip = new();
     private readonly System.Windows.Forms.Timer _clock = new() { Interval = 1000 };
     private readonly Label _badge;
     private readonly Label _profileName;
@@ -399,7 +399,8 @@ public sealed class MainForm : Form
         var now = DateTime.UtcNow;
         var treasureHour = TreasureHours.Active(now);
         var goldenWeek = TreasureHours.GoldenWeekNotice(now);
-        _countTip.SetToolTip(_pirateLabel, goldenWeek != null ? TreasureHours.GoldenWeekDetails : "");
+        var goldenWeekTip = goldenWeek != null ? TreasureHours.GoldenWeekDetails : "";
+        _countTip.SetAnchoredToolTip(_pirateLabel, goldenWeekTip);
         _pirateLabel.Text = pirateAlert
             ? (s.PirateTokenLive ? L.T("★ TOKEN PIRATA · Detectado en esta partida", "★ PIRATE TOKEN · Detected in this match")
                 : L.T("★ TOKEN PIRATA · Detectado en la partida anterior", "★ PIRATE TOKEN · Detected in the previous match"))
@@ -475,7 +476,7 @@ public sealed class MainForm : Form
         _title.ForeColor = on ? Theme.Amber : Theme.Cyan;
         _hero.EdgeColor = _pirateCard.EdgeColor = on ? Theme.Amber : null;
         _pirateCard.BackColor = _pirateLabel.BackColor = on ? Theme.TreasurePanel : Theme.Panel;
-        if (IsHandleCreated) Theme.Border(Handle, on ? Theme.Amber : null);
+        if (IsHandleCreated) Theme.Border(Handle, on ? Theme.Amber : Theme.CardEdge);
     }
 
     /// <summary>
@@ -501,7 +502,7 @@ public sealed class MainForm : Form
             var text = L.F("Tesoro en {0}", "Treasure in {0}", TreasureHours.Countdown(next.StartUtc - now));
             if (_countLabel.Text != text) _countLabel.Text = text;
             var tip = L.F("Próxima Hora del tesoro: {0}", "Next Treasure Hour: {0}", TreasureHours.When(next));
-            if (_countTip.GetToolTip(_countLabel) != tip) _countTip.SetToolTip(_countLabel, tip);
+            _countTip.SetAnchoredToolTip(_countLabel, tip);
         }
     }
 

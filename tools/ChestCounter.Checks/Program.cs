@@ -69,7 +69,7 @@ internal static class Program
             Check(texts.All(text => !text!.Contains("{0}")), "Unformatted translation: " + code);
         }
         L.Use(originalLanguage);
-        Check(AppInfo.Version == new Version(2, 0, 28, 0), "Release version was not updated");
+        Check(AppInfo.Version == new Version(2, 0, 29, 0), "Release version was not updated");
         foreach (var p in new[] { "Playlist_DefaultSolo", "Playlist_DefaultSquad", "Playlist_NoBuildBR_Trio", "Playlist_Trios", "Playlist_HabaneroBR_Solo" })
             Check(Profiles.IsBattleRoyalePlaylist(p), "BR rejected: " + p);
         foreach (var p in new string?[] { null, "", "Playlist_Creative", "Playlist_BlastBerry_Squad", "Playlist_Reload_Solo", "Playlist_DefaultSquad_LTM", "Playlist_Delulu", "Playlist_Festival" })
@@ -125,9 +125,39 @@ internal static class Program
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
         Application.EnableVisualStyles();
         var welcomeLanguage = L.Code;
+        var tipType = typeof(MainForm).Assembly.GetType("ChestCounter.ThemedToolTip")!;
+        var measureTip = tipType.GetMethod("Measure", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var paintTip = tipType.GetMethod("PaintTip", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var placeTip = tipType.GetMethod("Place", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var workArea = new Rectangle(-1920, 40, 1920, 1040);
+        var popupSize = new Size(360, 160);
+        foreach (var cursor in new[] { new Point(-1000, 400), new Point(-1900, 50), new Point(-10, 50), new Point(-10, 1070), new Point(-1900, 1070) })
+        {
+            var position = (Point)placeTip.Invoke(null, new object[] { cursor, popupSize, workArea, 16 })!;
+            Check(workArea.Contains(new Rectangle(position, popupSize)), "Tooltip escaped monitor working area");
+            Check(Math.Abs(position.X - cursor.X) <= popupSize.Width + 16 && Math.Abs(position.Y - cursor.Y) <= popupSize.Height + 16, "Tooltip detached from cursor");
+            if (cursor == new Point(-1000, 400)) Check(position == new Point(-984, 416), "Tooltip is not anchored beside the pointer");
+        }
         foreach (var (code, _) in L.Languages)
         {
             L.Use(code);
+            foreach (var dpi in new[] { 96, 144, 192 })
+            {
+                var scale = dpi / 96f;
+                using var font = new Font("Segoe UI", 9f * scale);
+                var padding = (int)Math.Round(12 * scale);
+                foreach (var screenWidth in new[] { 320, 1920 })
+                {
+                    var maxWidth = Math.Min((int)(360 * scale), screenWidth - 2 * padding);
+                    var tipSize = (Size)measureTip.Invoke(null, new object[] { TreasureHours.GoldenWeekDetails, font, padding, maxWidth })!;
+                    Check(tipSize.Width <= maxWidth && tipSize.Width > padding * 2, "Tooltip exceeds available width: " + code);
+                    Check(tipSize.Height > font.Height * 2 + padding * 2, "Golden Week tooltip did not wrap: " + code);
+                    using var tip = new Bitmap(tipSize.Width, tipSize.Height);
+                    using var graphics = Graphics.FromImage(tip);
+                    paintTip.Invoke(null, new object[] { graphics, new Rectangle(Point.Empty, tipSize), TreasureHours.GoldenWeekDetails, font, padding });
+                    if (dpi == 96 && screenWidth == 1920) tip.Save(Path.Combine(output, "tooltip-" + code + ".png"));
+                }
+            }
             using var welcome = (Form)Activator.CreateInstance(typeof(ThanksDialog), nonPublic: true)!;
             welcome.StartPosition = FormStartPosition.Manual;
             welcome.Location = new Point(-30000, -30000);

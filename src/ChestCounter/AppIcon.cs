@@ -11,7 +11,11 @@ internal static class AppIcon
     {
         try
         {
-            return Environment.ProcessPath is { } path ? Icon.ExtractAssociatedIcon(path) : null;
+            // ProcessPath can be dotnet.exe or a test host. Always use our own chest resource.
+            using var stream = typeof(AppIcon).Assembly.GetManifestResourceStream("ChestCounter.app.ico");
+            if (stream == null) return null;
+            using var icon = new Icon(stream, new Size(32, 32));
+            return (Icon)icon.Clone();
         }
         catch
         {

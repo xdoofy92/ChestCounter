@@ -51,6 +51,11 @@ internal static class Theme
             DwmSetWindowAttribute(hwnd, 19, ref on, sizeof(int)); // nombre anterior de la misma opción
             int round = 2;                                        // DWMWCP_ROUND
             DwmSetWindowAttribute(hwnd, 33, ref round, sizeof(int)); // DWMWA_WINDOW_CORNER_PREFERENCE
+            int caption = Bg.R | (Bg.G << 8) | (Bg.B << 16);
+            int text = Ink.R | (Ink.G << 8) | (Ink.B << 16);
+            DwmSetWindowAttribute(hwnd, 35, ref caption, sizeof(int)); // DWMWA_CAPTION_COLOR
+            DwmSetWindowAttribute(hwnd, 36, ref text, sizeof(int)); // DWMWA_TEXT_COLOR
+            Border(hwnd, CardEdge);
         }
         catch
         {

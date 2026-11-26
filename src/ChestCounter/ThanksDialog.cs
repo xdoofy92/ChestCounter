@@ -15,6 +15,8 @@ public sealed class ThanksDialog : Form
     public const string CreatorCode = "DOOFY";
 
     private const int W = 470, Pad = 20, TextX = 72;
+    private Point? _dragOffset;
+    private readonly Image? _chestImage;
 
     private ThanksDialog()
     {
@@ -24,30 +26,43 @@ public sealed class ThanksDialog : Form
         Font = Theme.Text();
         BackColor = Theme.Bg;
         ForeColor = Theme.Ink;
-        FormBorderStyle = FormBorderStyle.FixedDialog;
+        FormBorderStyle = FormBorderStyle.None;
+        DoubleBuffered = true;
         MaximizeBox = false;
         MinimizeBox = false;
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.CenterParent;
         Icon = AppIcon.Load();
 
-        // Cabecera: corazón en un círculo, título y versión.
+        // Cabecera propia: mismo fondo y cofre que el resto de la app, sin marco claro del sistema.
         var icon = new Card { Location = new Point(Pad, Pad), Size = new Size(40, 40), Radius = 20, BackColor = Theme.Panel };
-        icon.Controls.Add(new Label
+        _chestImage = Icon?.ToBitmap();
+        icon.Controls.Add(new PictureBox
         {
-            Text = "♥",
-            Font = Theme.Text(15f, FontStyle.Bold),
-            ForeColor = Theme.Rose,
+            Image = _chestImage,
+            SizeMode = PictureBoxSizeMode.Zoom,
             BackColor = Color.Transparent,
-            Location = new Point(0, 0),
-            Size = new Size(40, 40),
-            TextAlign = ContentAlignment.MiddleCenter,
+            Location = new Point(4, 4),
+            Size = new Size(32, 32),
+            AccessibleName = "ChestCounter",
         });
         Controls.Add(icon);
 
+        var close = new PillButton
+        {
+            Text = "×",
+            AccessibleName = L.T("Cerrar", "Close"),
+            Font = Theme.Text(13f),
+            Location = new Point(W - Pad - 28, Pad),
+            Size = new Size(28, 28),
+            Radius = 9,
+            DialogResult = DialogResult.Cancel,
+        };
+        Controls.Add(close);
+
         var y = Pad - 1;
-        y = AddText(this, L.T("¡Bienvenido a ChestCounter!", "Welcome to ChestCounter!"), Theme.Text(12f, FontStyle.Bold), Theme.Ink, TextX, y, W - TextX - Pad) + 4;
-        y = AddText(this, L.F("Versión {0} · Un mensaje de Doofy", "Version {0} · A message from Doofy", AppInfo.VersionText), Theme.Text(9f), Theme.Muted, TextX, y, W - TextX - Pad);
+        y = AddText(this, L.T("¡Bienvenido a ChestCounter!", "Welcome to ChestCounter!"), Theme.Text(12f, FontStyle.Bold), Theme.Ink, TextX, y, W - TextX - Pad - 36) + 4;
+        y = AddText(this, L.F("Versión {0} · Un mensaje de Doofy", "Version {0} · A message from Doofy", AppInfo.VersionText), Theme.Text(9f), Theme.Muted, TextX, y, W - TextX - Pad - 36);
         y = Math.Max(y, Pad + 40) + 16;
 
         // El mensaje, en una tarjeta.
@@ -169,6 +184,42 @@ public sealed class ThanksDialog : Form
         CancelButton = ok;
         ActiveControl = ok;
         ClientSize = new Size(W, y + 36 + Pad);
+        foreach (Control control in Controls)
+            if (control != close && control.Top < Pad + 40) AttachHeaderDrag(control);
+        AttachHeaderDrag(this, backgroundOnly: true);
+    }
+
+    private void AttachHeaderDrag(Control control, bool backgroundOnly = false)
+    {
+        control.MouseDown += (_, e) =>
+        {
+            if (e.Button == MouseButtons.Left && (!backgroundOnly || e.Y < Pad + 40))
+            {
+                _dragOffset = new Point(Cursor.Position.X - Left, Cursor.Position.Y - Top);
+                control.Capture = true;
+            }
+        };
+        control.MouseMove += (_, e) =>
+        {
+            if (e.Button == MouseButtons.Left && _dragOffset is Point offset)
+                Location = new Point(Cursor.Position.X - offset.X, Cursor.Position.Y - offset.Y);
+        };
+        control.MouseUp += (_, _) => { _dragOffset = null; control.Capture = false; };
+        foreach (Control child in control.Controls)
+            if (!backgroundOnly) AttachHeaderDrag(child);
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+        using var edge = new Pen(Theme.CardEdge);
+        e.Graphics.DrawRectangle(edge, 0, 0, ClientSize.Width - 1, ClientSize.Height - 1);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing) _chestImage?.Dispose();
+        base.Dispose(disposing);
     }
 
     /// <summary>Muestra el mensaje sobre la ventana dueña (tras actualizar, o con el corazón de la ventana principal).</summary>

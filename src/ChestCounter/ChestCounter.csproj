@@ -7,7 +7,7 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
     <AssemblyName>ChestCounter</AssemblyName>
     <RootNamespace>ChestCounter</RootNamespace>
-    <Version>2.0.28</Version>
+    <Version>2.0.29</Version>
     <InvariantGlobalization>false</InvariantGlobalization>
     <!-- Single-file publish: the parser discovers its types by reflection, so no trimming. -->
     <PublishTrimmed>false</PublishTrimmed>
@@ -17,6 +17,7 @@
     <TieredPGO>true</TieredPGO>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="app.ico" LogicalName="ChestCounter.app.ico" />
     <!-- Logos de redes para el pie de Ajustes (PNG en el propio ejecutable). -->
     <EmbeddedResource Include="Assets\social-*.png" LogicalName="ChestCounter.Assets.%(Filename).png" />
   </ItemGroup>
