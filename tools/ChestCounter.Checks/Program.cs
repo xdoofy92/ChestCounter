@@ -13,6 +13,30 @@ internal static class Program
     {
         var output = Path.GetFullPath(args[0]);
         Directory.CreateDirectory(output);
+        var analyzer = new ReplayAnalyzer();
+        var export = typeof(ReplayAnalyzer).GetMethod("OnExportRead", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var searches = (System.Collections.IList)typeof(ReplayAnalyzer).GetField("_searches", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(analyzer)!;
+        void Send(bool? searched = null, uint? pawn = null, bool destroyed = false) => export.Invoke(analyzer,
+            new object[] { 1u, new FortniteReplayReader.Models.NetFieldExports.Items.GenericContainer { bAlreadySearched = searched, SearchingPawn = pawn, bDestroyed = destroyed } });
+        Send(false);
+        Send(true, 10);
+        Send(true, 10);
+        Send(pawn: 10);
+        Send(true, 10);
+        Check(searches.Count == 1, "Repeated or sparse exports duplicate an opening");
+        Send(false);
+        Send();
+        Send(true, 20);
+        Check(searches.Count == 2, "Replenished chest opening missing");
+        Check((uint?)searches[1]!.GetType().GetProperty("SearcherPawn")!.GetValue(searches[1]) == 20, "Replenished chest attributed to previous player");
+        Send(false);
+        Send(true);
+        Check(searches.Count == 3 && searches[2]!.GetType().GetProperty("SearcherPawn")!.GetValue(searches[2]) == null, "Reset retained stale searcher");
+        Send(false);
+        Send(pawn: 30, destroyed: true);
+        Send(pawn: 30, destroyed: true);
+        Send(true, 30);
+        Check(searches.Count == 4, "Destroyed replenished chest missing or duplicated");
         var goldenHours = TreasureHours.Schedule.Where(w => w.GoldOutfitMultiplier == 15m).ToArray();
         Check(goldenHours.Length == 2, "Golden Week must boost both November 28 ET sessions");
         foreach (var hour in goldenHours)
@@ -45,7 +69,7 @@ internal static class Program
             Check(texts.All(text => !text!.Contains("{0}")), "Unformatted translation: " + code);
         }
         L.Use(originalLanguage);
-        Check(AppInfo.Version == new Version(2, 0, 27, 0), "Release version was not updated");
+        Check(AppInfo.Version == new Version(2, 0, 28, 0), "Release version was not updated");
         foreach (var p in new[] { "Playlist_DefaultSolo", "Playlist_DefaultSquad", "Playlist_NoBuildBR_Trio", "Playlist_Trios", "Playlist_HabaneroBR_Solo" })
             Check(Profiles.IsBattleRoyalePlaylist(p), "BR rejected: " + p);
         foreach (var p in new string?[] { null, "", "Playlist_Creative", "Playlist_BlastBerry_Squad", "Playlist_Reload_Solo", "Playlist_DefaultSquad_LTM", "Playlist_Delulu", "Playlist_Festival" })
@@ -111,7 +135,7 @@ internal static class Program
             var creator = welcome.Controls.Cast<Control>().Single(c => c.Controls.OfType<Label>().Any(l => l.Text == ThanksDialog.CreatorCode));
             var changes = welcome.Controls.Cast<Control>().Single(c => c.Controls.OfType<Label>().Any(l => l.Text.StartsWith("•")));
             Check(creator.Top >= changes.Bottom, "Creator code must follow the changelog: " + code);
-            Check(changes.Controls.OfType<Label>().Count(l => l.Text.StartsWith("•")) == 4, "Release notes missing: " + code);
+            Check(changes.Controls.OfType<Label>().Count(l => l.Text.StartsWith("•")) == 5, "Release notes missing: " + code);
             Check(welcome.Controls.Cast<Control>().All(c => c.Right <= welcome.ClientSize.Width && c.Bottom <= welcome.ClientSize.Height), "Welcome layout overflow: " + code);
             foreach (var label in changes.Controls.OfType<Label>())
             {

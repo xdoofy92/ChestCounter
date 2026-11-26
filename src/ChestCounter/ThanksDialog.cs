@@ -61,6 +61,7 @@ public sealed class ThanksDialog : Form
         my = AddText(message, L.T("Novedades de esta versión", "What's new in this version"), Theme.Text(9f, FontStyle.Bold), Theme.Cyan, 16, my, cardW - 32) + 8;
         foreach (var change in new[]
         {
+            L.T("• Los cofres reabastecidos cuentan al volver a abrirlos.", "• Replenished chests count each time you reopen them."),
             L.T("• Golden Week: todos los tesoros del 28/11 al 05/12.", "• Golden Week: all treasures from Nov 28 to Dec 5."),
             L.T("• Trajes ×2 en la semana; ×15 en las horas del 28/11.", "• Outfits ×2 all week; ×15 in Nov 28 Treasure Hours."),
             L.T("• Inicio en hora local y avisos según la fase del evento.", "• Local start time and notices for each event phase."),

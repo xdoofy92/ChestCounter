@@ -98,7 +98,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 16;
+    public const int CurrentVersion = 17;
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -391,13 +391,19 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
         {
             case BaseContainer container:
                 var observedBefore = !_containersObserved.Add(channelIndex);
+                var containerKey = _channelKey.GetValueOrDefault(channelIndex, $"ch:{channelIndex}");
+                // Export groups contain deltas: null means this field was not sent. Only an explicit
+                // reset rearms the container after replenishment, including across channel changes.
+                if (container.bAlreadySearched == false && _searched.Remove(containerKey))
+                {
+                    _lastSearcher.Remove(channelIndex);
+                }
                 if (container.SearchingPawn is uint searcher && searcher != 0)
                 {
                     _lastSearcher[channelIndex] = searcher;
                 }
 
-                var containerKey = _channelKey.GetValueOrDefault(channelIndex, $"ch:{channelIndex}");
-                if (container.bAlreadySearched)
+                if (container.bAlreadySearched == true)
                 {
                     if (_searched.Add(containerKey))
                     {
