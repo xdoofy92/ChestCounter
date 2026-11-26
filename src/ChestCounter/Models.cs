@@ -168,6 +168,12 @@ public sealed class Config
     /// <summary>The thank-you message (end of the token hunt) was already shown once, after updating.</summary>
     public bool ThanksShown { get; set; }
 
+    /// <summary>Version whose welcome/changelog was acknowledged; null includes existing and first-time users.</summary>
+    public string? WelcomeVersion { get; set; }
+
+    [JsonIgnore]
+    public bool NeedsWelcome => WelcomeVersion != AppInfo.VersionText;
+
     /// <summary>
     /// "auto" (install new versions between matches, default), "prompt" (offer them) or "off" (never check GitHub).
     /// Saved under a new name since 2.0.21: everyone moved to automatic updates once; later choices are kept.

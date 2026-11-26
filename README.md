@@ -51,9 +51,13 @@ ChestCounter lee las repeticiones (replays) que Fortnite guarda de cada partida 
 - **Equipo** (con *Compañeros* activado): tus cofres y los de cada compañero en la partida actual o la última, el total del equipo y lo que aportan ellos.
 - **Botones**: **Overlay** (punto verde = activado), **Informe** y **Ajustes**. Si hay varias cuentas en el PC, arriba aparece un selector de perfil.
 - **Horas del tesoro** (más probabilidad de tesoros): la tarjeta de abajo dice cuándo es la próxima, en tu hora local. El día que hay una, junto al título aparece una cuenta atrás; durante la hora, la ventana, el overlay y la página de OBS se ponen dorados y el título cuenta el tiempo que queda.
-- **♥** (arriba a la derecha): un mensaje de agradecimiento, con el código de creador **DOOFY**.
+- **♥** (arriba a la derecha): vuelve a abrir el mensaje de Doofy y las novedades de la versión, con el código de creador **DOOFY** al final. Se muestra una sola vez por versión al abrir la ventana, también después de la configuración del primer uso.
+
+**Golden Week (28/11–evento del 05/12 de 2026):** vuelven los tesoros de todas las semanas anteriores. Los trajes dorados tienen ×2 de probabilidad base y ×15 total durante las Horas del tesoro del 28/11; vehículos y calcomanías ×10 y acceso a la Tienda pirata ×1,5 durante esas horas. La tarjeta anuncia el inicio en hora local y cambia según la fase del evento; el 05/12 indica que termina con el evento, sin inventar una hora de cierre. Los detalles aparecen al pasar el cursor. [Anuncio de Epic](https://communities.epicgames.com/thread/golden-week-starts-november-28/MuNA/) · [Cambios de la versión 2.0.27](docs/releases/v2.0.27.md).
 
 La ventana se puede redimensionar y maximizar: todo crece en proporción.
+
+<p align="center"><img src="docs/welcome-2.0.27.png" alt="Mensaje personal y novedades de la versión 2.0.27" width="470"></p>
 
 Las estadísticas incluyen únicamente las playlists reconocidas de Battle Royale y Cero construcción (v43 o posterior). Ajustes también se puede redimensionar y maximizar.
 

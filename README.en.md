@@ -189,6 +189,12 @@ ChestCounter.exe --overlay-preview <file.png>   save overlay previews and quit
 
 ## Building from source
 
+Version **2.0.27** adds Golden Week information (November 28 until the December 5, 2026 event): treasures from all previous weeks return, with gold outfits at ×2 base odds and ×15 total during November 28 Treasure Hours. Vehicles/decals get ×10 and Pirate Shop access ×1.5 during those hours. The card shows the start in local time, changes by event phase, and refers to the final event without inventing an end time. Hover for details. [Epic announcement](https://communities.epicgames.com/thread/golden-week-starts-november-28/MuNA/).
+
+The personal welcome and version changelog appear once per version when the window is first shown, including after first-time setup. The creator code **DOOFY** appears at the end. Reopen the message with the **♥** button. All new content is available in the app's ten languages. [Release notes](docs/releases/v2.0.27.md).
+
+<p align="center"><img src="docs/welcome-2.0.27.png" alt="Personal welcome and version 2.0.27 changelog (Spanish preview)" width="470"></p>
+
 Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (Windows x64) and double-click **`build.bat`**: the exe goes to `dist\ChestCounter.exe`. GitHub Actions builds the exe on every push and publishes it when a `v*` tag is pushed.
 
 ## License and credits

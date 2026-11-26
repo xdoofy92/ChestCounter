@@ -29,6 +29,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: ChestCounter
@@ -41,6 +42,8 @@ jobs:
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$TAG" dist/ChestCounter.exe --clobber --repo "$GITHUB_REPOSITORY"
           else
-            # No changelog in this app's releases: just the download.
             gh release create "$TAG" dist/ChestCounter.exe --title "$TAG" --notes "Descarga **ChestCounter.exe** y ábrelo (Windows 10 / 11, sin instalación). Si ya lo tienes, se actualiza solo." --latest --repo "$GITHUB_REPOSITORY"
+          fi
+          if [ -f "docs/releases/$TAG.md" ]; then
+            gh release edit "$TAG" --notes-file "docs/releases/$TAG.md" --repo "$GITHUB_REPOSITORY"
           fi

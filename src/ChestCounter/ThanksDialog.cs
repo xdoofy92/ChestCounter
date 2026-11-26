@@ -5,7 +5,7 @@ using System.Windows.Forms;
 namespace ChestCounter;
 
 /// <summary>
-/// Mensaje de agradecimiento, mostrado una sola vez tras actualizar: la búsqueda del token llega a su fin.
+/// Bienvenida y novedades, mostradas una vez por versión, también en el primer uso.
 /// Mismo aspecto que el resto de la aplicación (fondo oscuro, tarjetas redondeadas, botones píldora) y el código
 /// de creador DOOFY destacado, con botón para copiarlo y enlace a X.
 /// </summary>
@@ -46,7 +46,7 @@ public sealed class ThanksDialog : Form
         Controls.Add(icon);
 
         var y = Pad - 1;
-        y = AddText(this, L.T("Gracias por usar ChestCounter", "Thank you for using ChestCounter"), Theme.Text(12f, FontStyle.Bold), Theme.Ink, TextX, y, W - TextX - Pad) + 4;
+        y = AddText(this, L.T("¡Bienvenido a ChestCounter!", "Welcome to ChestCounter!"), Theme.Text(12f, FontStyle.Bold), Theme.Ink, TextX, y, W - TextX - Pad) + 4;
         y = AddText(this, L.F("Versión {0} · Un mensaje de Doofy", "Version {0} · A message from Doofy", AppInfo.VersionText), Theme.Text(9f), Theme.Muted, TextX, y, W - TextX - Pad);
         y = Math.Max(y, Pad + 40) + 16;
 
@@ -54,21 +54,23 @@ public sealed class ThanksDialog : Form
         var cardW = W - 2 * Pad;
         var message = new Card { Location = new Point(Pad, y), Radius = 14, BackColor = Theme.Card };
         var my = 14;
-        foreach (var paragraph in new[]
+        my = AddText(message, L.Big("releaseIntro",
+            "¡Última semana de tesoros! Gracias por compartir esta locura de cofres conmigo. Ojalá Golden Week nos dé esa alegría que falta.",
+            "One last week of treasure! Thanks for sharing this chest-opening adventure with me. I hope Golden Week brings us that lucky moment."),
+            Theme.Text(9f), Theme.Ink, 16, my, cardW - 32) + 14;
+        my = AddText(message, L.T("Novedades de esta versión", "What's new in this version"), Theme.Text(9f, FontStyle.Bold), Theme.Cyan, 16, my, cardW - 32) + 8;
+        foreach (var change in new[]
         {
-            L.T("Ha sido un largo viaje en busca del token, donde el juego dejó de ser un battle royale y pasó a ser la búsqueda del One Piece: ese token, esas tiendas gratis, miles de cofres abiertos, cientos de horas… y así, solo unos pocos afortunados lograron encontrarlo.",
-                "It has been a long journey in search of the token, where the game stopped being a battle royale and became the hunt for the One Piece: that token, those free shops, thousands of chests opened, hundreds of hours… and so, a lucky few found it."),
-            L.T("Esta travesía está llegando a su fin. Espero que esta app los haya ayudado a ver qué tan locos estuvimos en esta búsqueda implacable…",
-                "This voyage is coming to an end. I hope this app helped you see how crazy we all were in this relentless hunt…"),
-            L.T("No fui de los afortunados, pero estoy feliz de haber podido hacer algo por la comunidad de mi juego favorito, Fortnite.",
-                "I wasn't one of the lucky ones, but I'm happy I could do something for the community of my favorite game, Fortnite."),
-            L.T("Además, gracias a esta app se me ocurrió una idea: una nueva app que comenzaré a desarrollar pronto. ¡Ya les contaré más!",
-                "Also, thanks to this app I came up with an idea: a new app that I'll start developing soon. I'll tell you more about it!"),
+            L.T("• Golden Week: todos los tesoros del 28/11 al 05/12.", "• Golden Week: all treasures from Nov 28 to Dec 5."),
+            L.T("• Trajes ×2 en la semana; ×15 en las horas del 28/11.", "• Outfits ×2 all week; ×15 in Nov 28 Treasure Hours."),
+            L.T("• Inicio en hora local y avisos según la fase del evento.", "• Local start time and notices for each event phase."),
+            L.T("• Información de Golden Week en los diez idiomas.", "• Golden Week information in all ten languages."),
         })
         {
-            my = AddText(message, paragraph, Theme.Text(9f), Theme.Ink, 16, my, cardW - 32) + 8;
+            my = AddText(message, change, Theme.Text(9f), Theme.Ink, 16, my, cardW - 32) + 7;
         }
-        my = AddText(message, L.T("Gracias a todos, se les quiere.", "Thank you all, much love."), Theme.Text(9f, FontStyle.Bold), Theme.Rose, 16, my, cardW - 32);
+        my += 4;
+        my = AddText(message, L.T("Seguiré creando cosas para ustedes. Se les quiere. ♥", "I'll keep creating things for you. Much love. ♥"), Theme.Text(9f, FontStyle.Bold), Theme.Rose, 16, my, cardW - 32);
         message.Size = new Size(cardW, my + 14);
         Controls.Add(message);
         y += message.Height + 12;
@@ -81,7 +83,7 @@ public sealed class ThanksDialog : Form
         var textX = 14 + codeW + 10;
         var textW = cardW - textX - 12 - copyW - 14;
         var ty = AddText(code, L.T("Mi código de creador", "My creator code"), Theme.Text(8.5f, FontStyle.Bold), Theme.Ink, textX, rowPad, textW);
-        ty = AddText(code, L.T("Úsalo en la tienda de Fortnite al menos una vez. ¡Gracias!", "Use it in the Fortnite Item Shop at least once. Thanks!"), Theme.Text(8f), Theme.Muted, textX, ty, textW);
+        ty = AddText(code, L.T("Si quieren apoyarme, úsalo en la tienda de Fortnite. ♥", "To support me, use it in the Fortnite Item Shop. ♥"), Theme.Text(8f), Theme.Muted, textX, ty, textW);
         var rowH = Math.Max(ty - rowPad, 38);
         code.Size = new Size(cardW, rowH + 2 * rowPad);
         code.Controls.Add(new Label

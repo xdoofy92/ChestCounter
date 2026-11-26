@@ -13,6 +13,39 @@ internal static class Program
     {
         var output = Path.GetFullPath(args[0]);
         Directory.CreateDirectory(output);
+        var goldenHours = TreasureHours.Schedule.Where(w => w.GoldOutfitMultiplier == 15m).ToArray();
+        Check(goldenHours.Length == 2, "Golden Week must boost both November 28 ET sessions");
+        foreach (var hour in goldenHours)
+        {
+            Check(hour.StartUtc.Kind == DateTimeKind.Utc && hour.EndUtc - hour.StartUtc == TimeSpan.FromHours(2), "Treasure Hour UTC duration changed");
+            Check(TreasureHours.Active(hour.StartUtc) == hour, "Treasure Hour start excluded");
+            Check(TreasureHours.Active(hour.EndUtc) == null, "Treasure Hour end included");
+            Check(TreasureHours.Boosts(hour).Contains("×15"), "Golden Week boost missing from UI text");
+        }
+        Check(TreasureHours.Schedule.Where(w => !goldenHours.Contains(w)).All(w => w.GoldOutfitMultiplier == 7.5m), "Historical boosts changed");
+        Check(TreasureHours.GoldenWeekNotice(new DateTime(2026, 12, 2, 18, 0, 0, DateTimeKind.Utc)) != null, "Midweek Golden Week notice missing");
+        Check(TreasureHours.Active(new DateTime(2026, 12, 2, 18, 0, 0, DateTimeKind.Utc)) == null, "Golden Week treated as continuous Treasure Hours");
+        var originalLanguage = L.Code;
+        var start = TreasureHours.GoldenWeekStartUtc;
+        var finalDay = new DateTime(2026, 12, 5, 5, 0, 0, DateTimeKind.Utc);
+        var retired = new DateTime(2026, 12, 6, 5, 0, 0, DateTimeKind.Utc);
+        L.Use("es");
+        Check(TreasureHours.GoldenWeekNotice(start.AddTicks(-1))!.Contains("Empieza"), "Boost advertised before official start");
+        Check(TreasureHours.GoldenWeekNotice(start)!.Contains("En curso"), "Golden Week not live at official start");
+        Check(TreasureHours.GoldenWeekNotice(finalDay)!.Contains("evento"), "Final day needs event wording instead of an invented end time");
+        Check(!TreasureHours.GoldenWeekNotice(finalDay)!.Contains("×2"), "Final day claims boost remains active after unknown event time");
+        Check(TreasureHours.GoldenWeekNotice(retired.AddTicks(-1)) != null && TreasureHours.GoldenWeekNotice(retired) == null, "Notice retirement must use the announcement's ET calendar date");
+        L.Use("en");
+        var english = new[] { TreasureHours.GoldenWeekNotice(start.AddTicks(-1)), TreasureHours.GoldenWeekNotice(start), TreasureHours.GoldenWeekNotice(finalDay), TreasureHours.GoldenWeekDetails, TreasureHours.Boosts(goldenHours[0]) };
+        foreach (var (code, _) in L.Languages.Where(l => l.Code is not "es" and not "en"))
+        {
+            L.Use(code);
+            var texts = new[] { TreasureHours.GoldenWeekNotice(start.AddTicks(-1)), TreasureHours.GoldenWeekNotice(start), TreasureHours.GoldenWeekNotice(finalDay), TreasureHours.GoldenWeekDetails, TreasureHours.Boosts(goldenHours[0]) };
+            Check(texts.Where((text, i) => string.IsNullOrWhiteSpace(text) || text == english[i]).Count() == 0, "Golden Week translation missing: " + code);
+            Check(texts.All(text => !text!.Contains("{0}")), "Unformatted translation: " + code);
+        }
+        L.Use(originalLanguage);
+        Check(AppInfo.Version == new Version(2, 0, 27, 0), "Release version was not updated");
         foreach (var p in new[] { "Playlist_DefaultSolo", "Playlist_DefaultSquad", "Playlist_NoBuildBR_Trio", "Playlist_Trios", "Playlist_HabaneroBR_Solo" })
             Check(Profiles.IsBattleRoyalePlaylist(p), "BR rejected: " + p);
         foreach (var p in new string?[] { null, "", "Playlist_Creative", "Playlist_BlastBerry_Squad", "Playlist_Reload_Solo", "Playlist_DefaultSquad_LTM", "Playlist_Delulu", "Playlist_Festival" })
@@ -23,6 +56,15 @@ internal static class Program
         var match = new MatchRecord { Playlist = "Playlist_NoBuildBR_Squad", GameVersion = "++Fortnite+Release-43.10", PlayerName = "Test", EpicId = "test", ChestsOpened = 3,
             TreasureFinds = new() { own }, NearbyTreasureFinds = new() { team, nearby }, Teammates = new() { new() { Name = "Mate", ChestsSeen = 4 } } };
         var config = new Config();
+        Check(config.NeedsWelcome, "First-time user must see the welcome/changelog");
+        config.ThanksShown = true;
+        Check(config.NeedsWelcome, "Legacy thank-you flag hides the new changelog");
+        config.WelcomeVersion = "2.0.26";
+        Check(config.NeedsWelcome, "Upgrade must show the new changelog");
+        config.WelcomeVersion = AppInfo.VersionText;
+        Check(!config.NeedsWelcome, "Welcome repeats on the same version");
+        var restoredConfig = JsonSerializer.Deserialize<Config>(JsonSerializer.Serialize(config))!;
+        Check(!restoredConfig.NeedsWelcome, "Welcome acknowledgement does not persist");
         Check(Profiles.Adjust(match, config)!.TreasureFinds.Count == 1, "Team treasures default off");
         config.CountTeammateTreasures = true;
         var adjusted = Profiles.Adjust(match, config)!;
@@ -58,6 +100,29 @@ internal static class Program
         File.WriteAllText(Path.Combine(output, "report-test.html"), html);
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
         Application.EnableVisualStyles();
+        var welcomeLanguage = L.Code;
+        foreach (var (code, _) in L.Languages)
+        {
+            L.Use(code);
+            using var welcome = (Form)Activator.CreateInstance(typeof(ThanksDialog), nonPublic: true)!;
+            welcome.StartPosition = FormStartPosition.Manual;
+            welcome.Location = new Point(-30000, -30000);
+            welcome.Show();
+            var creator = welcome.Controls.Cast<Control>().Single(c => c.Controls.OfType<Label>().Any(l => l.Text == ThanksDialog.CreatorCode));
+            var changes = welcome.Controls.Cast<Control>().Single(c => c.Controls.OfType<Label>().Any(l => l.Text.StartsWith("•")));
+            Check(creator.Top >= changes.Bottom, "Creator code must follow the changelog: " + code);
+            Check(changes.Controls.OfType<Label>().Count(l => l.Text.StartsWith("•")) == 4, "Release notes missing: " + code);
+            Check(welcome.Controls.Cast<Control>().All(c => c.Right <= welcome.ClientSize.Width && c.Bottom <= welcome.ClientSize.Height), "Welcome layout overflow: " + code);
+            foreach (var label in changes.Controls.OfType<Label>())
+            {
+                var size = TextRenderer.MeasureText(label.Text, label.Font, new Size(label.Width, int.MaxValue), TextFormatFlags.WordBreak | TextFormatFlags.NoPadding);
+                Check(size.Height <= label.Height, "Welcome text clipped: " + code);
+            }
+            using var preview = new Bitmap(welcome.Width, welcome.Height);
+            welcome.DrawToBitmap(preview, new Rectangle(Point.Empty, preview.Size));
+            preview.Save(Path.Combine(output, "welcome-" + code + ".png"));
+        }
+        L.Use(welcomeLanguage);
         var store = new Store(Path.Combine(output, "isolated-data"));
         var tracker = new Tracker(store, config, data);
         var monitor = new ChestCounter.Monitor(store, config, data, tracker, store.Folder);

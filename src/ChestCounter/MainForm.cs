@@ -398,14 +398,16 @@ public sealed class MainForm : Form
         var pirateAlert = s.PirateTokenLive || st.LastMatch?.PirateToken == true;
         var now = DateTime.UtcNow;
         var treasureHour = TreasureHours.Active(now);
+        var goldenWeek = TreasureHours.GoldenWeekNotice(now);
+        _countTip.SetToolTip(_pirateLabel, goldenWeek != null ? TreasureHours.GoldenWeekDetails : "");
         _pirateLabel.Text = pirateAlert
             ? (s.PirateTokenLive ? L.T("★ TOKEN PIRATA · Detectado en esta partida", "★ PIRATE TOKEN · Detected in this match")
                 : L.T("★ TOKEN PIRATA · Detectado en la partida anterior", "★ PIRATE TOKEN · Detected in the previous match"))
                 + "\n" + (s.TokenDetails ?? L.T("Ver detalles en Tesoros →", "View details in Treasures →"))
             : treasureHour != null
                 ? L.T("★ HORA DEL TESORO · Más probabilidad de tesoros", "★ TREASURE HOUR · Better treasure odds")
-                    + "\n" + L.T("Tienda pirata ×1,5 · Traje dorado ×7,5 · Vehículo ×10", "Pirate Shop ×1.5 · Gold outfit ×7.5 · Vehicle ×10")
-            : L.T("TOKEN DE TIENDA PIRATA · Sin detecciones", "PIRATE SHOP TOKEN · No detections") + "\n"
+                    + "\n" + TreasureHours.Boosts(treasureHour)
+            : (goldenWeek ?? L.T("TOKEN DE TIENDA PIRATA · Sin detecciones", "PIRATE SHOP TOKEN · No detections")) + "\n"
                 + (TreasureHours.Next(now) is { } next
                     ? L.F("Próxima Hora del tesoro: {0} · Ver Tesoros →", "Next Treasure Hour: {0} · View Treasures →", TreasureHours.When(next))
                     : L.T("Tu replay y equipo · Ver Tesoros →", "Your replay and team · View Treasures →"));
